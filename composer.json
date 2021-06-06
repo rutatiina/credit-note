@@ -17,5 +17,12 @@
         "psr-4": {
             "Rutatiina\\CreditNote\\": "src/"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Rutatiina\\CreditNote\\CreditNoteServiceProvider"
+            ]
+        }
     }
 }
