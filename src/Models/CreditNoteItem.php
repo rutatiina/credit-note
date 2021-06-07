@@ -46,9 +46,14 @@ class CreditNoteItem extends Model
         }
     }
 
-    public function txn()
+    public function credit_note()
     {
-        return $this->belongsTo('Rutatiina\FinancialAccounting\Models\Txn', 'txn_id');
+        return $this->belongsTo('Rutatiina\CreditNote\Models\CreditNote', 'credit_note_id', 'id');
+    }
+
+    public function taxes()
+    {
+        return $this->hasMany('Rutatiina\CreditNote\Models\CreditNoteItemTax', 'credit_note_item_id', 'id');
     }
 
 }

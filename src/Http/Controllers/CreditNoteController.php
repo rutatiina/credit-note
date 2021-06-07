@@ -208,6 +208,7 @@ class CreditNoteController extends Controller
             return [
                 'status' => true,
                 'messages' => ['Credit Note deleted'],
+                'callback' => URL::route('credit-notes.index', [], false)
             ];
         }
         else

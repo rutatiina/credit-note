@@ -113,7 +113,6 @@ class CreditNoteService
             $Txn->total = $data['total'];
             $Txn->branch_id = $data['branch_id'];
             $Txn->store_id = $data['store_id'];
-            $Txn->due_date = $data['due_date'];
             $Txn->contact_notes = $data['contact_notes'];
             $Txn->terms_and_conditions = $data['terms_and_conditions'];
             $Txn->status = $data['status'];
@@ -218,7 +217,6 @@ class CreditNoteService
             $Txn->total = $data['total'];
             $Txn->branch_id = $data['branch_id'];
             $Txn->store_id = $data['store_id'];
-            $Txn->due_date = $data['due_date'];
             $Txn->contact_notes = $data['contact_notes'];
             $Txn->terms_and_conditions = $data['terms_and_conditions'];
             $Txn->status = $data['status'];
