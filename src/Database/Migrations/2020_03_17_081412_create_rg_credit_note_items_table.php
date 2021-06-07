@@ -27,9 +27,8 @@ class CreateRgCreditNoteItemsTable extends Migration
             //>> table columns
             $table->unsignedBigInteger('project_id')->nullable();
             $table->unsignedBigInteger('credit_note_id');
-            $table->enum('type', ['item', 'contact', 'account', 'txn_type', 'txn', 'tax'])->nullable();
-            $table->unsignedBigInteger('type_id')->nullable();
             $table->unsignedBigInteger('contact_id')->nullable();
+            $table->unsignedBigInteger('item_id')->nullable();
             $table->string('name', 100);
             $table->string('description', 250)->nullable();
             $table->unsignedInteger('quantity');
