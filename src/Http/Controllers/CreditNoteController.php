@@ -20,8 +20,6 @@ class CreditNoteController extends Controller
 
     // >> get the item attributes template << !!important
 
-    private $txnEntreeSlug = 'credit-note';
-
     public function __construct()
     {
         $this->middleware('permission:credit-notes.view');
@@ -99,9 +97,6 @@ class CreditNoteController extends Controller
                 'expiry' => ''
             ]
         ];
-
-        unset($txnAttributes['debit_contact_id']); //!important
-        unset($txnAttributes['credit_contact_id']); //!important
 
         $data = [
             'pageTitle' => 'Create Credit Note', #required
@@ -251,29 +246,12 @@ class CreditNoteController extends Controller
 
         $txnAttributes = CreditNoteService::copy($id);
 
-        $data = [
+        return [
             'pageTitle' => 'Copy Credit Note', #required
             'pageAction' => 'Copy', #required
             'txnUrlStore' => '/credit-notes', #required
             'txnAttributes' => $txnAttributes, #required
         ];
-
-        if (FacadesRequest::wantsJson())
-        {
-            return $data;
-        }
-    }
-
-    public function datatables(Request $request)
-    {
-
-        $txns = Transaction::setRoute('show', route('accounting.sales.credit-notes.show', '_id_'))
-            ->setRoute('edit', route('accounting.sales.credit-notes.edit', '_id_'))
-            ->setSortBy($request->sort_by)
-            ->paginate(false)
-            ->findByEntree($this->txnEntreeSlug);
-
-        return Datatables::of($txns)->make(true);
     }
 
     public function exportToExcel(Request $request)
