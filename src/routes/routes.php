@@ -11,7 +11,7 @@ Route::group(['middleware' => ['web', 'auth', 'tenant', 'service.accounting']], 
 
     });
 
-    Route::resource('credit-notes/settings', 'Rutatiina\CreditNote\Http\Controllers\SettingsController');
+    Route::resource('credit-notes/settings', 'Rutatiina\CreditNote\Http\Controllers\CreditNoteSettingsController');
     Route::resource('credit-notes', 'Rutatiina\CreditNote\Http\Controllers\CreditNoteController');
 
 });

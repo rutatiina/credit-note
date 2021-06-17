@@ -4,7 +4,7 @@ namespace Rutatiina\CreditNote\Services;
 
 use Illuminate\Support\Facades\Validator;
 use Rutatiina\Contact\Models\Contact;
-use Rutatiina\CreditNote\Models\Setting;
+use Rutatiina\CreditNote\Models\CreditNoteSetting;
 
 class CreditNoteValidateService
 {
@@ -58,7 +58,7 @@ class CreditNoteValidateService
 
         // << data validation <<------------------------------------------------------------
 
-        $settings = Setting::has('financial_account_to_debit')
+        $settings = CreditNoteSetting::has('financial_account_to_debit')
             ->has('financial_account_to_credit')
             ->with(['financial_account_to_debit', 'financial_account_to_credit'])
             ->firstOrFail();

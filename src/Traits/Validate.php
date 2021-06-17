@@ -5,7 +5,7 @@ namespace Rutatiina\CreditNote\Traits;
 use Illuminate\Support\Facades\Validator;
 use Rutatiina\Contact\Models\Contact;
 use Rutatiina\CreditNote\Models\CreditNote;
-use Rutatiina\CreditNote\Models\Setting;
+use Rutatiina\CreditNote\Models\CreditNoteSetting;
 use Rutatiina\FinancialAccounting\Models\Account;
 use Rutatiina\Tax\Models\Tax;
 
@@ -167,7 +167,7 @@ trait Validate
 
         // << data validation <<------------------------------------------------------------
 
-        $this->settings = Setting::with(['financial_account_to_debit', 'financial_account_to_credit'])->first();
+        $this->settings = CreditNoteSetting::with(['financial_account_to_debit', 'financial_account_to_credit'])->first();
 
         if (!$this->settings->financial_account_to_debit && !$this->settings->financial_account_to_credit)
         {
