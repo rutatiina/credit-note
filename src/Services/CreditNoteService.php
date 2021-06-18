@@ -388,11 +388,16 @@ class CreditNoteService
 
         try
         {
-            CreditNoteApprovalService::run($data);
+            $data['status'] = 'approved';
+            $approvalService = CreditNoteApprovalService::run($data);
 
             //update the status of the txn
-            $Txn->status = 'Approved';
-            $Txn->save();
+            if ($approvalService)
+            {
+                $Txn->status = 'approved';
+                $Txn->balances_where_updated = 1;
+                $Txn->save();
+            }
 
             DB::connection('tenant')->commit();
 
