@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Rutatiina\CreditNote\Models\CreditNote;
+use Rutatiina\CreditNote\Models\CreditNoteLedger;
 use Rutatiina\FinancialAccounting\Services\AccountBalanceUpdateService;
 use Rutatiina\FinancialAccounting\Services\ContactBalanceUpdateService;
 use Rutatiina\CreditNote\Models\CreditNoteSetting;
@@ -125,10 +126,32 @@ class CreditNoteService
             CreditNoteItemService::store($data);
 
             //Save the ledgers >> $data['ledgers']; and update the balances
-            //NOTE >> no need to update ledgers since this is not an accounting entry
+            $ledgerModels = [];
+            foreach ($data['ledgers'] as &$ledger)
+            {
+                $ledgerModels[] = new CreditNoteLedger($ledger);
+                //$ledger['credit_note_id'] = $data['id'];
+                //$Txn->ledgers()->save((new CreditNoteLedger($ledger))); //save the ledger details
+            }
+            unset($ledger);
+
+            $Txn->ledgers()->saveMany($ledgerModels);
+
+
+
+
+            //CreditNoteLedgerService::store($Txn);
 
             //check status and update financial account and contact balances accordingly
-            CreditNoteApprovalService::run($data);
+            $approval = CreditNoteApprovalService::run($Txn);
+
+            ////update the status of the txn
+            //if ($approval)
+            //{
+            //    $Txn->status = $data['status'];
+            //    $Txn->balances_where_updated = 1;
+            //    $Txn->save();
+            //}
 
             DB::connection('tenant')->commit();
 
