@@ -137,21 +137,10 @@ class CreditNoteService
 
             $Txn->ledgers()->saveMany($ledgerModels);
 
+            $Txn->refresh(); //make the ledgers relationship infor available
 
-
-
-            //CreditNoteLedgerService::store($Txn);
-
-            //check status and update financial account and contact balances accordingly
-            $approval = CreditNoteApprovalService::run($Txn);
-
-            ////update the status of the txn
-            //if ($approval)
-            //{
-            //    $Txn->status = $data['status'];
-            //    $Txn->balances_where_updated = 1;
-            //    $Txn->save();
-            //}
+            //update financial account and contact balances accordingly
+            CreditNoteApprovalService::run($Txn);
 
             DB::connection('tenant')->commit();
 
@@ -212,6 +201,7 @@ class CreditNoteService
             $Txn->items()->delete();
             $Txn->item_taxes()->delete();
             $Txn->comments()->delete();
+            $Txn->delete();
 
             //reverse the account balances
             AccountBalanceUpdateService::doubleEntry($Txn->toArray(), true);
@@ -219,46 +209,11 @@ class CreditNoteService
             //reverse the contact balances
             ContactBalanceUpdateService::doubleEntry($Txn->toArray(), true);
 
-            $Txn->tenant_id = $data['tenant_id'];
-            $Txn->created_by = Auth::id();
-            $Txn->document_name = $data['document_name'];
-            $Txn->number = $data['number'];
-            $Txn->date = $data['date'];
-            $Txn->debit_financial_account_code = $data['debit_financial_account_code'];
-            $Txn->credit_financial_account_code = $data['credit_financial_account_code'];
-            $Txn->contact_id = $data['contact_id'];
-            $Txn->contact_name = $data['contact_name'];
-            $Txn->contact_address = $data['contact_address'];
-            $Txn->reference = $data['reference'];
-            $Txn->base_currency = $data['base_currency'];
-            $Txn->quote_currency = $data['quote_currency'];
-            $Txn->exchange_rate = $data['exchange_rate'];
-            $Txn->taxable_amount = $data['taxable_amount'];
-            $Txn->total = $data['total'];
-            $Txn->branch_id = $data['branch_id'];
-            $Txn->store_id = $data['store_id'];
-            $Txn->contact_notes = $data['contact_notes'];
-            $Txn->terms_and_conditions = $data['terms_and_conditions'];
-            $Txn->status = $data['status'];
-
-            $Txn->save();
-
-            $data['id'] = $Txn->id;
-
-            //print_r($data['items']); exit;
-
-            //Save the items >> $data['items']
-            CreditNoteItemService::store($data);
-
-            //Save the ledgers >> $data['ledgers']; and update the balances
-            CreditNoteLedgersService::store($data);
-
-            //check status and update financial account and contact balances accordingly
-            CreditNoteApprovalService::run($data);
+            $txnStore = self::store($requestInstance);
 
             DB::connection('tenant')->commit();
 
-            return $Txn;
+            return $txnStore;
 
         }
         catch (\Throwable $e)
@@ -404,23 +359,13 @@ class CreditNoteService
             return false;
         }
 
-        $data = $Txn->toArray();
-
         //start database transaction
         DB::connection('tenant')->beginTransaction();
 
         try
         {
-            $data['status'] = 'approved';
-            $approvalService = CreditNoteApprovalService::run($data);
-
-            //update the status of the txn
-            if ($approvalService)
-            {
-                $Txn->status = 'approved';
-                $Txn->balances_where_updated = 1;
-                $Txn->save();
-            }
+            $Txn->status = 'approved';
+            CreditNoteApprovalService::run($Txn);
 
             DB::connection('tenant')->commit();
 
