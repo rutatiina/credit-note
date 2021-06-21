@@ -130,8 +130,6 @@ class CreditNoteService
             foreach ($data['ledgers'] as &$ledger)
             {
                 $ledgerModels[] = new CreditNoteLedger($ledger);
-                //$ledger['credit_note_id'] = $data['id'];
-                //$Txn->ledgers()->save((new CreditNoteLedger($ledger))); //save the ledger details
             }
             unset($ledger);
 
@@ -201,13 +199,14 @@ class CreditNoteService
             $Txn->items()->delete();
             $Txn->item_taxes()->delete();
             $Txn->comments()->delete();
-            $Txn->delete();
 
             //reverse the account balances
             AccountBalanceUpdateService::doubleEntry($Txn->toArray(), true);
 
             //reverse the contact balances
             ContactBalanceUpdateService::doubleEntry($Txn->toArray(), true);
+
+            $Txn->delete();
 
             $txnStore = self::store($requestInstance);
 

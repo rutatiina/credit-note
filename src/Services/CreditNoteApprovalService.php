@@ -30,7 +30,7 @@ trait CreditNoteApprovalService
         //Update the contact balances
         ContactBalanceUpdateService::doubleEntry($txn);
 
-        $txn->status = $txn['status'];
+        $txn->status = 'approved';
         $txn->balances_where_updated = 1;
         $txn->save();
 
