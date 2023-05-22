@@ -2,16 +2,17 @@
 
 namespace Rutatiina\CreditNote\Services;
 
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
+use Rutatiina\Tax\Models\Tax;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Rutatiina\CreditNote\Models\CreditNote;
 use Rutatiina\CreditNote\Models\CreditNoteLedger;
+use Rutatiina\CreditNote\Models\CreditNoteSetting;
+use Rutatiina\FinancialAccounting\Services\ItemBalanceUpdateService;
 use Rutatiina\FinancialAccounting\Services\AccountBalanceUpdateService;
 use Rutatiina\FinancialAccounting\Services\ContactBalanceUpdateService;
-use Rutatiina\CreditNote\Models\CreditNoteSetting;
-use Rutatiina\Tax\Models\Tax;
 
 class CreditNoteService
 {
@@ -207,6 +208,9 @@ class CreditNoteService
             //reverse the contact balances
             ContactBalanceUpdateService::doubleEntry($Txn->toArray(), true);
 
+            //Update the item balances
+            ItemBalanceUpdateService::entry($Txn->toArray(), true);
+
             $Txn->delete();
 
             $txnStore = self::store($requestInstance);
@@ -267,6 +271,9 @@ class CreditNoteService
 
             //reverse the contact balances
             ContactBalanceUpdateService::doubleEntry($Txn, true);
+
+            //Update the item balances
+            ItemBalanceUpdateService::entry($Txn, true);
 
             $Txn->delete();
 
