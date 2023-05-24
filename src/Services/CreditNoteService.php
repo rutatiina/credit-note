@@ -127,17 +127,7 @@ class CreditNoteService
             //Save the items >> $data['items']
             CreditNoteItemService::store($data);
 
-            //Save the ledgers >> $data['ledgers']; and update the balances
-            $ledgerModels = [];
-            foreach ($data['ledgers'] as &$ledger)
-            {
-                $ledgerModels[] = new CreditNoteLedger($ledger);
-            }
-            unset($ledger);
-
-            $Txn->ledgers()->saveMany($ledgerModels);
-
-            $Txn->refresh(); //make the ledgers relationship infor available
+            $Txn->refresh();
 
             //update financial account and contact balances accordingly
             CreditNoteApprovalService::run($Txn);
@@ -188,7 +178,7 @@ class CreditNoteService
 
         try
         {
-            $Txn = CreditNote::with('items', 'ledgers')->findOrFail($data['id']);
+            $Txn = CreditNote::with('items')->findOrFail($data['id']);
 
             if ($Txn->status == 'approved')
             {
@@ -197,7 +187,6 @@ class CreditNoteService
             }
 
             //Delete affected relations
-            $Txn->ledgers()->delete();
             $Txn->items()->delete();
             $Txn->item_taxes()->delete();
             $Txn->comments()->delete();
@@ -252,19 +241,13 @@ class CreditNoteService
 
         try
         {
-            $Txn = CreditNote::with('items', 'ledgers')->findOrFail($id);
+            $Txn = CreditNote::with('items')->findOrFail($id);
 
             if ($Txn->status == 'approved')
             {
                 self::$errors[] = 'Approved Credit note(s) cannot be not be deleted';
                 return false;
             }
-
-            //Delete affected relations
-            $Txn->ledgers()->delete();
-            $Txn->items()->delete();
-            $Txn->item_taxes()->delete();
-            $Txn->comments()->delete();
 
             //reverse the account balances
             AccountBalanceUpdateService::doubleEntry($Txn, true);
@@ -358,7 +341,7 @@ class CreditNoteService
 
     public static function approve($id)
     {
-        $Txn = CreditNote::with(['ledgers'])->findOrFail($id);
+        $Txn = CreditNote::findOrFail($id);
 
         if (strtolower($Txn->status) != 'draft')
         {
